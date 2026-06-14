@@ -53,9 +53,10 @@ jobs:
 
       - name: Build and start app
         run: |
-          cd frontend && npm install && npm run build
-          cd ../backend && npm install && npm run build
-          mkdir -p backend/dist/../public
+          npm install
+          cd backend && npm install && npm run build
+          cd ../frontend && npm install && npm run build
+          cd ..
           cp -r frontend/dist backend/public
           cd backend && node dist/index.js &
           sleep 5
