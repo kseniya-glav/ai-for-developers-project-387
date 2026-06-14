@@ -32,7 +32,7 @@ export function generateSlots(
     let slotStart = new Date(current);
     slotStart.setHours(WORKING_START, 0, 0, 0);
 
-    while (slotStart < endDay) {
+    while (slotStart < endDay && slotStart.getHours() < WORKING_END) {
       if (slotStart > now) {
         const slotEnd = new Date(slotStart.getTime() + durationMs);
 
