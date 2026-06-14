@@ -2,7 +2,7 @@ name: Scheduled Checks
 
 on:
   schedule:
-    - cron: "7 * * * *"
+    - cron: "17 3 * * *"
   workflow_dispatch:
 
 jobs:
