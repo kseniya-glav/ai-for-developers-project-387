@@ -69,20 +69,20 @@ jobs:
             --numberOfRuns=1 \
             --settings.preset=desktop \
           || true
-          # Copy results from .lighthouseci to our directory
-          cp .lighthouseci/lhr-*.json lighthouse-results/ 2>/dev/null || true
+          # Copy all results from .lighthouseci to our directory
+          ls -la .lighthouseci/ 2>/dev/null || true
+          cp .lighthouseci/*.json lighthouse-results/ 2>/dev/null || true
 
       - name: Generate summary
         run: |
-          JSON_FILE=$(ls lighthouse-results/lhr-*.json 2>/dev/null | head -1)
+          JSON_FILE=$(ls lighthouse-results/*.json 2>/dev/null | head -1)
           if [ -n "$JSON_FILE" ]; then
             echo "## Lighthouse Report" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Report saved as artifact. Download to view full results." >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             SCORES=$(node -e "
-              const data = require('$JSON_FILE');
-              const cats = data.categories || {};
+              const data = require('./' + '$JSON_FILE');
               const lines = [];
               for (const [name, cat] of Object.entries(cats)) {
                 const score = Math.round((cat.score || 0) * 100);
