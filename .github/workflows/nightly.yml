@@ -61,7 +61,7 @@ jobs:
           cd backend && node dist/index.js &
           sleep 5
 
-      - name: Run Lighthouse audit
+      - name: Run Lighthouse audit and generate summary
         run: |
           mkdir -p lighthouse-results
           lhci collect \
@@ -69,20 +69,18 @@ jobs:
             --numberOfRuns=1 \
             --settings.preset=desktop \
           || true
-          # Copy all results from .lighthouseci to our directory
-          ls -la .lighthouseci/ 2>/dev/null || true
-          cp .lighthouseci/*.json lighthouse-results/ 2>/dev/null || true
-
-      - name: Generate summary
-        run: |
-          JSON_FILE=$(ls lighthouse-results/*.json 2>/dev/null | head -1)
+          cp .lighthouseci/lhr-*.json lighthouse-results/ 2>/dev/null || true
+          cp .lighthouseci/lhr-*.html lighthouse-results/ 2>/dev/null || true
+          ls lighthouse-results/
+          JSON_FILE=$(ls "$GITHUB_WORKSPACE/lighthouse-results/"*.json 2>/dev/null | head -1)
           if [ -n "$JSON_FILE" ]; then
             echo "## Lighthouse Report" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Report saved as artifact. Download to view full results." >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            SCORES=$(node -e "
-              const data = require('./' + '$JSON_FILE');
+            node -e "
+              const data = require('$JSON_FILE');
+              const cats = data.categories || {};
               const lines = [];
               for (const [name, cat] of Object.entries(cats)) {
                 const score = Math.round((cat.score || 0) * 100);
@@ -92,8 +90,7 @@ jobs:
               console.log('| Category | Score |');
               console.log('|---|---|');
               console.log(lines.join('\n'));
-            " 2>/dev/null || echo "Could not parse scores")
-            echo "$SCORES" >> $GITHUB_STEP_SUMMARY
+            " >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo "Could not parse scores" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "## Lighthouse: no results generated" >> $GITHUB_STEP_SUMMARY
           fi
