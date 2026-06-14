@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: booking-api
+    runtime: docker
+    plan: free
+    envVars:
+      - key: PORT
+        sync: false
+      - key: OWNER_NAME
+        value: Алексей Иванов
+      - key: OWNER_EMAIL
+        value: alexey@example.com

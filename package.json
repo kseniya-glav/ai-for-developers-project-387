@@ -1,0 +1,19 @@
+{
+  "name": "booking-api",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "compile": "tsp compile main.tsp",
+    "test:e2e": "playwright test --config=tests/playwright.config.ts"
+  },
+  "dependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/http": "latest",
+    "@typespec/openapi3": "latest",
+    "@typespec/rest": "latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
+  }
+}
