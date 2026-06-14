@@ -78,6 +78,7 @@ export function EventTypesPage() {
 
       {slotsEventType && (
         <SlotsDialog
+          key={slotsEventType.id}
           eventType={slotsEventType}
           open={!!slotsEventType}
           onOpenChange={(open) => {
