@@ -29,33 +29,33 @@ export function generateSlots(
 
   const current = new Date(startDay);
   while (current < endDay) {
-    for (let hour = WORKING_START; hour < WORKING_END; hour++) {
-      const slotStart = new Date(current);
-      slotStart.setHours(hour, 0, 0, 0);
+    let slotStart = new Date(current);
+    slotStart.setHours(WORKING_START, 0, 0, 0);
 
-      if (slotStart <= now) continue;
+    while (slotStart < endDay && slotStart.getHours() < WORKING_END) {
+      if (slotStart > now) {
+        const slotEnd = new Date(slotStart.getTime() + durationMs);
 
-      const slotEnd = new Date(slotStart.getTime() + durationMs);
+        if (slotEnd.getHours() < WORKING_END ||
+            (slotEnd.getHours() === WORKING_END && slotEnd.getMinutes() === 0)) {
+          const slotStartISO = slotStart.toISOString();
+          const slotEndISO = slotEnd.toISOString();
 
-      if (slotEnd.getHours() > WORKING_END ||
-          (slotEnd.getHours() === WORKING_END && slotEnd.getMinutes() > 0)) {
-        continue;
+          const isBooked = existingBookings.some(
+            (b) => slotStartISO < b.endTime && b.startTime < slotEndISO
+          );
+
+          if (!isBooked) {
+            slots.push({
+              startTime: slotStartISO,
+              endTime: slotEndISO,
+              eventTypeId: eventType.id,
+            });
+          }
+        }
       }
 
-      const slotStartISO = slotStart.toISOString();
-      const slotEndISO = slotEnd.toISOString();
-
-      const isBooked = existingBookings.some(
-        (b) => slotStartISO < b.endTime && b.startTime < slotEndISO
-      );
-
-      if (!isBooked) {
-        slots.push({
-          startTime: slotStartISO,
-          endTime: slotEndISO,
-          eventTypeId: eventType.id,
-        });
-      }
+      slotStart = new Date(slotStart.getTime() + durationMs);
     }
     current.setDate(current.getDate() + 1);
   }
